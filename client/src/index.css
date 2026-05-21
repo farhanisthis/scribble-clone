@@ -224,7 +224,7 @@ h2 {
 
 .primary-button,
 .secondary-button {
-  border-radius: 999px;
+  border-radius: 15px;
   padding: 10px 16px;
   border: 1px solid transparent;
   font-size: 0.92rem;
@@ -295,7 +295,9 @@ h2 {
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.07);
-  transition: background-color 160ms ease, border-color 160ms ease;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease;
 }
 
 .player-item--drawer {
@@ -353,7 +355,7 @@ h2 {
 .play-button {
   width: 100%;
   padding: 14px 24px;
-  border-radius: 999px;
+  border-radius: 15px;
   border: none;
   font-size: 1.2rem;
   font-weight: 700;
@@ -483,7 +485,10 @@ h2 {
   background: rgba(245, 158, 11, 0.12);
   border: 1px solid rgba(245, 158, 11, 0.25);
   color: #fcd34d;
-  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    color 300ms ease;
 }
 
 .timer-badge--urgent {
@@ -494,8 +499,13 @@ h2 {
 }
 
 @keyframes timer-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }
 
 .word-display {
@@ -519,7 +529,7 @@ h2 {
   color: rgba(245, 239, 231, 0.85);
   letter-spacing: 0.32em;
   font-size: 1.3rem;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
 }
 
 .word-text--revealed {
@@ -568,12 +578,8 @@ h2 {
   width: 100%;
   height: auto;
   background:
-    radial-gradient(
-        circle,
-        rgba(255, 255, 255, 0.025) 1px,
-        transparent 1px
-      )
-      0 0 / 24px 24px,
+    radial-gradient(circle, rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0
+      0 / 24px 24px,
     linear-gradient(180deg, #1c1f30 0%, #181b2a 100%);
   touch-action: none;
 }
@@ -993,7 +999,9 @@ h2 {
   border-radius: 999px;
   min-width: 36px;
   text-align: center;
-  transition: color 300ms ease, transform 300ms ease;
+  transition:
+    color 300ms ease,
+    transform 300ms ease;
 }
 
 .player-item--guessed {
@@ -1107,5 +1115,40 @@ h2 {
   .canvas-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HERO LOGO VIBES
+   ═══════════════════════════════════════════════════════════════ */
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-logo {
+  max-width: 300px;
+  width: 100%;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  animation: floatLogo 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(52, 211, 153, 0.4))
+    drop-shadow(0 0 40px rgba(236, 72, 153, 0.3));
+}
+
+@keyframes floatLogo {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 0 20px rgba(52, 211, 153, 0.4))
+      drop-shadow(0 0 40px rgba(236, 72, 153, 0.3));
+  }
+  50% {
+    transform: translateY(-10px) scale(1.02);
+    filter: drop-shadow(0 0 25px rgba(52, 211, 153, 0.6))
+      drop-shadow(0 0 50px rgba(236, 72, 153, 0.5));
   }
 }

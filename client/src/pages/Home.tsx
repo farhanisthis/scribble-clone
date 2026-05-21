@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { socket } from "../socket";
+import scribloLogo from "../assets/scriblo-logo.png";
 
 // ─── Types ──────────────────────────────────────────────────────
 
@@ -22,9 +23,9 @@ function Home() {
 
   const [playerName, setPlayerName] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState<
-    "play" | "create" | "join" | null
-  >(null);
+  const [loading, setLoading] = useState<"play" | "create" | "join" | null>(
+    null,
+  );
 
   // Show / hide the private room panel.
   const [showPrivate, setShowPrivate] = useState(false);
@@ -113,7 +114,6 @@ function Home() {
 
   // ── Join Private Room ─────────────────────────────────────────
 
-
   // ── Join via Invite Token ──────────────────────────────────────
 
   const handleJoinViaInvite = () => {
@@ -154,10 +154,12 @@ function Home() {
       {/* ── Hero card ── */}
       <section className="panel hero-card">
         <p className="eyebrow">Multiplayer Drawing Game</p>
-        <h1>Scriblo!</h1>
         <p className="lede">
           Draw, guess, and compete with friends in real time.
         </p>
+        <div className="logo-container">
+          <img src={scribloLogo} alt="Scriblo Logo" className="hero-logo" />
+        </div>
 
         {/* Player name */}
         <label className="field">
