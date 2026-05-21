@@ -123,7 +123,7 @@ function Game() {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const [overlayMessage, setOverlayMessage] = useState<string | null>(null);
-  const overlayTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const overlayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Keep a ref of isDrawer so mouse handlers always see the latest value
   // without re-creating the callbacks (which would cause effect churn).
@@ -676,8 +676,14 @@ function Game() {
                 <p className="word-overlay-timer">Returning to lobby…</p>
               </div>
             )}
-          </div>
 
+            {/* Dynamic Announcement Overlay */}
+            {overlayMessage && (
+              <div className="canvas-announcement-overlay">
+                <h2>{overlayMessage}</h2>
+              </div>
+            )}
+          </div>
           {/* ── Chat box (right of canvas) ── */}
           {game.status !== "waiting" && (
             <div className="chat-box">
