@@ -23,19 +23,80 @@ const DRAWER_BONUS = 50; // points drawer gets per correct guesser
 // ─── Word Bank ──────────────────────────────────────────────────
 
 const WORD_BANK = [
-  "apple", "banana", "car", "dog", "elephant", "flower", "guitar", "house",
-  "island", "jacket", "kite", "lamp", "mountain", "notebook", "ocean", "piano",
-  "queen", "robot", "sun", "tree", "umbrella", "violin", "whale", "xylophone",
-  "yacht", "zebra", "airplane", "bridge", "castle", "diamond", "eagle", "forest",
-  "globe", "hammer", "igloo", "jungle", "kangaroo", "lighthouse", "mushroom",
-  "necklace", "octopus", "penguin", "rainbow", "sandwich", "telephone", "unicorn",
-  "volcano", "waterfall", "bicycle", "candle", "dragon", "feather", "giraffe",
-  "helicopter", "icecream", "jellyfish", "koala", "lemon", "mermaid", "ninja",
-  "orange", "parrot", "rocket", "starfish", "tornado", "vampire", "wizard"
+  "apple",
+  "banana",
+  "car",
+  "dog",
+  "elephant",
+  "flower",
+  "guitar",
+  "house",
+  "island",
+  "jacket",
+  "kite",
+  "lamp",
+  "mountain",
+  "notebook",
+  "ocean",
+  "piano",
+  "queen",
+  "robot",
+  "sun",
+  "tree",
+  "umbrella",
+  "violin",
+  "whale",
+  "xylophone",
+  "yacht",
+  "zebra",
+  "airplane",
+  "bridge",
+  "castle",
+  "diamond",
+  "eagle",
+  "forest",
+  "globe",
+  "hammer",
+  "igloo",
+  "jungle",
+  "kangaroo",
+  "lighthouse",
+  "mushroom",
+  "necklace",
+  "octopus",
+  "penguin",
+  "rainbow",
+  "sandwich",
+  "telephone",
+  "unicorn",
+  "volcano",
+  "waterfall",
+  "bicycle",
+  "candle",
+  "dragon",
+  "feather",
+  "giraffe",
+  "helicopter",
+  "icecream",
+  "jellyfish",
+  "koala",
+  "lemon",
+  "mermaid",
+  "ninja",
+  "orange",
+  "parrot",
+  "rocket",
+  "starfish",
+  "tornado",
+  "vampire",
+  "wizard",
 ];
 
 function maskWord(word) {
-  return word.split("").map((ch) => (ch === " " ? "  " : "_")).join(" ");
+  return word
+    .split("")
+    .map((ch) => (ch === " " ? "  " : "_"))
+    .join(" ");
 }
 
 // ─── State ─────────────────────────────────────────────────────
@@ -61,13 +122,24 @@ function createRoom(roomCode, isPublic, hostId, settings) {
     roomCode,
     isPublic,
     hostId,
-    inviteToken: isPublic ? null : Math.random().toString(36).slice(2, 8).toUpperCase(),
+    inviteToken: isPublic
+      ? null
+      : Math.random().toString(36).slice(2, 8).toUpperCase(),
     settings: {
       maxPlayers: Number(settings.maxPlayers) || DEFAULT_MAX_PLAYERS,
-      rounds: Math.min(Math.max(Number(settings.rounds) || DEFAULT_MAX_ROUNDS, 1), 10),
-      drawTime: Math.min(Math.max(Number(settings.drawTime) || DEFAULT_ROUND_TIME, 15), 240),
+      rounds: Math.min(
+        Math.max(Number(settings.rounds) || DEFAULT_MAX_ROUNDS, 1),
+        10,
+      ),
+      drawTime: Math.min(
+        Math.max(Number(settings.drawTime) || DEFAULT_ROUND_TIME, 15),
+        240,
+      ),
       wordCount: Math.min(Math.max(Number(settings.wordCount) || 3, 1), 5),
-      hints: settings.hints !== undefined ? Math.min(Math.max(Number(settings.hints), 0), 5) : 2
+      hints:
+        settings.hints !== undefined
+          ? Math.min(Math.max(Number(settings.hints), 0), 5)
+          : 2,
     },
     players: new Map(),
     strokeHistory: [],
@@ -79,12 +151,15 @@ function createRoom(roomCode, isPublic, hostId, settings) {
       maskedWord: "",
       wordChoices: [],
       round: 0,
-      maxRounds: Math.min(Math.max(Number(settings.rounds) || DEFAULT_MAX_ROUNDS, 1), 10),
+      maxRounds: Math.min(
+        Math.max(Number(settings.rounds) || DEFAULT_MAX_ROUNDS, 1),
+        10,
+      ),
       roundTimeLeft: 0,
       timerId: null,
       hintTimerId: null,
       guessedPlayers: new Set(),
-    }
+    },
   };
 }
 
@@ -120,13 +195,13 @@ function addPlayerToRoom(room, socketId, name) {
 
 function removePlayerFromRoom(room, socketId) {
   room.players.delete(socketId);
-  
+
   if (room.hostId === socketId && room.players.size > 0) {
     room.hostId = room.players.keys().next().value;
     const newHostName = room.players.get(room.hostId)?.name || "Player";
     io.to(room.roomCode).emit("chat_message", {
       type: "system",
-      text: `${newHostName} is now the host.`
+      text: `${newHostName} is now the host.`,
     });
   }
 }
@@ -153,7 +228,10 @@ function getSnapshot(room, socketId) {
     round: g.round,
     maxRounds: g.maxRounds,
     currentDrawerId: drawerId,
-    currentDrawerName: drawerId && room.players.has(drawerId) ? room.players.get(drawerId).name : null,
+    currentDrawerName:
+      drawerId && room.players.has(drawerId)
+        ? room.players.get(drawerId).name
+        : null,
     maskedWord: g.maskedWord,
     currentWord: isDrawer ? g.currentWord : null,
     wordChoices: isDrawer && g.status === "choosing" ? g.wordChoices : [],
@@ -164,8 +242,11 @@ function getSnapshot(room, socketId) {
     isHost: socketId === room.hostId,
     isPublic: room.isPublic,
     inviteToken: room.inviteToken,
-    hostName: room.hostId && room.players.has(room.hostId) ? room.players.get(room.hostId).name : null,
-    settings: room.settings
+    hostName:
+      room.hostId && room.players.has(room.hostId)
+        ? room.players.get(room.hostId).name
+        : null,
+    settings: room.settings,
   };
 }
 
@@ -175,7 +256,7 @@ function broadcastGameState(room) {
     io.to(p.id).emit("game_state_update", {
       roomCode: room.roomCode,
       players: playersArr,
-      game: getSnapshot(room, p.id)
+      game: getSnapshot(room, p.id),
     });
   }
 }
@@ -183,7 +264,7 @@ function broadcastGameState(room) {
 function broadcastPlayerList(room) {
   io.to(room.roomCode).emit("player_list_updated", {
     roomCode: room.roomCode,
-    players: getPlayerList(room)
+    players: getPlayerList(room),
   });
 }
 
@@ -206,12 +287,12 @@ function startGame(room) {
   g.currentDrawerIndex = -1;
   g.round = 1;
   g.maxRounds = room.settings.rounds;
-  
+
   for (const player of room.players.values()) {
     player.score = 0;
     player.isReady = false;
   }
-  
+
   g.guessedPlayers = new Set();
   startNextTurn(room);
 }
@@ -233,7 +314,7 @@ function startNextTurn(room) {
   g.maskedWord = "";
   g.guessedPlayers = new Set();
   room.strokeHistory = [];
-  
+
   const shuffled = [...WORD_BANK].sort(() => Math.random() - 0.5);
   g.wordChoices = shuffled.slice(0, room.settings.wordCount);
   g.status = "choosing";
@@ -266,10 +347,10 @@ function selectWord(room, word) {
 
   broadcastGameState(room);
   clearTimers(g);
-  
+
   const numHints = room.settings.hints;
   if (numHints > 0) {
-     scheduleHints(room, numHints);
+    scheduleHints(room, numHints);
   }
 
   g.timerId = setInterval(() => {
@@ -306,22 +387,23 @@ function revealHint(room) {
   const g = room.game;
   const unrevealedIndices = [];
   const maskedArr = g.maskedWord.split("");
-  
+
   for (let i = 0; i < g.currentWord.length; i++) {
     if (g.currentWord[i] !== " " && maskedArr[i] === "_") {
       unrevealedIndices.push(i);
     }
   }
-  
+
   if (unrevealedIndices.length === 0) return;
 
-  const idx = unrevealedIndices[Math.floor(Math.random() * unrevealedIndices.length)];
+  const idx =
+    unrevealedIndices[Math.floor(Math.random() * unrevealedIndices.length)];
   maskedArr[idx] = g.currentWord[idx];
   g.maskedWord = maskedArr.join("");
-  
+
   io.to(room.roomCode).emit("chat_message", {
     type: "system",
-    text: "A hint was revealed!"
+    text: "A hint was revealed!",
   });
   broadcastGameState(room);
 }
@@ -335,7 +417,7 @@ function endTurn(room) {
   io.to(room.roomCode).emit("turn_over", { word: g.currentWord });
   io.to(room.roomCode).emit("chat_message", {
     type: "system",
-    text: `The word was: ${g.currentWord}`
+    text: `The word was: ${g.currentWord}`,
   });
 
   broadcastGameState(room);
@@ -356,12 +438,12 @@ function endGame(room) {
 
   io.to(room.roomCode).emit("game_over", {
     scores: getScores(room),
-    players: getPlayerList(room)
+    players: getPlayerList(room),
   });
 
   io.to(room.roomCode).emit("chat_message", {
     type: "system",
-    text: "Game over! Final scores are shown."
+    text: "Game over! Final scores are shown.",
   });
 
   broadcastGameState(room);
@@ -384,7 +466,7 @@ function checkGuess(room, socketId, guess) {
   if (g.guessedPlayers.has(socketId)) return true;
 
   const isCorrect = guess.toLowerCase() === (g.currentWord || "").toLowerCase();
-  
+
   if (isCorrect) {
     g.guessedPlayers.add(socketId);
     const player = room.players.get(socketId);
@@ -400,7 +482,7 @@ function checkGuess(room, socketId, guess) {
     io.to(room.roomCode).emit("chat_message", {
       type: "correct_guess",
       playerName: player ? player.name : "Someone",
-      text: `${player ? player.name : "Someone"} guessed the word! (+${guesserScore})`
+      text: `${player ? player.name : "Someone"} guessed the word! (+${guesserScore})`,
     });
 
     broadcastGameState(room);
@@ -416,6 +498,7 @@ function checkGuess(room, socketId, guess) {
 
 // ─── REST & Socket.IO Handlers ───────────────────────────────────
 
+app.get("/", (_req, res) => res.json({ status: "ok" }));
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
 io.on("connection", (socket) => {
@@ -426,7 +509,11 @@ io.on("connection", (socket) => {
   socket.on("quick_play", ({ playerName }, callback) => {
     let targetRoom = null;
     for (const room of globalState.rooms.values()) {
-      if (room.isPublic && room.game.status === "waiting" && room.players.size < room.settings.maxPlayers) {
+      if (
+        room.isPublic &&
+        room.game.status === "waiting" &&
+        room.players.size < room.settings.maxPlayers
+      ) {
         targetRoom = room;
         break;
       }
@@ -439,7 +526,7 @@ io.on("connection", (socket) => {
 
     const trimmedName = (playerName || "Player").trim() || "Player";
     addPlayerToRoom(targetRoom, socket.id, trimmedName);
-    
+
     socket.join(targetRoom.roomCode);
     socket.data.roomCode = targetRoom.roomCode;
     socket.data.playerName = trimmedName;
@@ -448,43 +535,53 @@ io.on("connection", (socket) => {
       success: true,
       roomCode: targetRoom.roomCode,
       players: getPlayerList(targetRoom),
-      game: getSnapshot(targetRoom, socket.id)
+      game: getSnapshot(targetRoom, socket.id),
     });
-    
+
     broadcastPlayerList(targetRoom);
     broadcastGameState(targetRoom);
   });
 
-  socket.on("create_private_room", ({ playerName, settings, roomCode: customCode }, callback) => {
-    let code = customCode ? customCode.trim().toUpperCase() : createRoomCode();
-    
-    if (customCode && globalState.rooms.get(code)) {
-      return callback?.({ success: false, message: `Room "${code}" already exists.` });
-    }
+  socket.on(
+    "create_private_room",
+    ({ playerName, settings, roomCode: customCode }, callback) => {
+      let code = customCode
+        ? customCode.trim().toUpperCase()
+        : createRoomCode();
 
-    const room = addRoom(code, false, socket.id, settings || {});
-    const trimmedName = (playerName || "Player").trim() || "Player";
-    
-    addPlayerToRoom(room, socket.id, trimmedName);
-    socket.join(room.roomCode);
-    socket.data.roomCode = room.roomCode;
-    socket.data.playerName = trimmedName;
+      if (customCode && globalState.rooms.get(code)) {
+        return callback?.({
+          success: false,
+          message: `Room "${code}" already exists.`,
+        });
+      }
 
-    callback?.({
-      success: true,
-      roomCode: room.roomCode,
-      players: getPlayerList(room),
-      game: getSnapshot(room, socket.id)
-    });
+      const room = addRoom(code, false, socket.id, settings || {});
+      const trimmedName = (playerName || "Player").trim() || "Player";
 
-    broadcastPlayerList(room);
-    broadcastGameState(room);
-  });
+      addPlayerToRoom(room, socket.id, trimmedName);
+      socket.join(room.roomCode);
+      socket.data.roomCode = room.roomCode;
+      socket.data.playerName = trimmedName;
+
+      callback?.({
+        success: true,
+        roomCode: room.roomCode,
+        players: getPlayerList(room),
+        game: getSnapshot(room, socket.id),
+      });
+
+      broadcastPlayerList(room);
+      broadcastGameState(room);
+    },
+  );
 
   socket.on("join_private_room", ({ roomCode, playerName }, callback) => {
     const room = globalState.rooms.get(roomCode);
-    if (!room) return callback?.({ success: false, message: "Room not found." });
-    if (room.players.size >= room.settings.maxPlayers) return callback?.({ success: false, message: "Room is full." });
+    if (!room)
+      return callback?.({ success: false, message: "Room not found." });
+    if (room.players.size >= room.settings.maxPlayers)
+      return callback?.({ success: false, message: "Room is full." });
 
     const trimmedName = (playerName || "Player").trim() || "Player";
     addPlayerToRoom(room, socket.id, trimmedName);
@@ -496,43 +593,49 @@ io.on("connection", (socket) => {
       success: true,
       roomCode,
       players: getPlayerList(room),
-      game: getSnapshot(room, socket.id)
+      game: getSnapshot(room, socket.id),
     });
 
     broadcastPlayerList(room);
     broadcastGameState(room);
   });
 
-  socket.on("join_via_invite_token", ({ inviteToken, playerName }, callback) => {
-    const roomCode = globalState.inviteTokens.get(inviteToken);
-    if (!roomCode) return callback?.({ success: false, message: "Invalid invite link." });
-    
-    const room = globalState.rooms.get(roomCode);
-    if (!room) return callback?.({ success: false, message: "Room not found." });
-    if (room.players.size >= room.settings.maxPlayers) return callback?.({ success: false, message: "Room is full." });
+  socket.on(
+    "join_via_invite_token",
+    ({ inviteToken, playerName }, callback) => {
+      const roomCode = globalState.inviteTokens.get(inviteToken);
+      if (!roomCode)
+        return callback?.({ success: false, message: "Invalid invite link." });
 
-    const trimmedName = (playerName || "Player").trim() || "Player";
-    addPlayerToRoom(room, socket.id, trimmedName);
-    socket.join(room.roomCode);
-    socket.data.roomCode = room.roomCode;
-    socket.data.playerName = trimmedName;
+      const room = globalState.rooms.get(roomCode);
+      if (!room)
+        return callback?.({ success: false, message: "Room not found." });
+      if (room.players.size >= room.settings.maxPlayers)
+        return callback?.({ success: false, message: "Room is full." });
 
-    callback?.({
-      success: true,
-      roomCode,
-      players: getPlayerList(room),
-      game: getSnapshot(room, socket.id)
-    });
+      const trimmedName = (playerName || "Player").trim() || "Player";
+      addPlayerToRoom(room, socket.id, trimmedName);
+      socket.join(room.roomCode);
+      socket.data.roomCode = room.roomCode;
+      socket.data.playerName = trimmedName;
 
-    broadcastPlayerList(room);
-    broadcastGameState(room);
-  });
+      callback?.({
+        success: true,
+        roomCode,
+        players: getPlayerList(room),
+        game: getSnapshot(room, socket.id),
+      });
+
+      broadcastPlayerList(room);
+      broadcastGameState(room);
+    },
+  );
 
   socket.on("toggle_ready", () => {
     const { roomCode } = socket.data;
     const room = globalState.rooms.get(roomCode);
     if (!room || room.game.status !== "waiting") return;
-    
+
     const player = room.players.get(socket.id);
     if (player) {
       player.isReady = !player.isReady;
@@ -544,20 +647,29 @@ io.on("connection", (socket) => {
     const { roomCode } = socket.data;
     const room = globalState.rooms.get(roomCode);
     if (!room) return;
-    
+
     if (!room.isPublic && socket.id !== room.hostId) {
-      return callback?.({ success: false, message: "Only the host can start the game." });
+      return callback?.({
+        success: false,
+        message: "Only the host can start the game.",
+      });
     }
     if (room.players.size < 2) {
-      return callback?.({ success: false, message: "Need at least 2 players." });
+      return callback?.({
+        success: false,
+        message: "Need at least 2 players.",
+      });
     }
     if (room.game.status !== "waiting") {
-      return callback?.({ success: false, message: "Game already in progress." });
+      return callback?.({
+        success: false,
+        message: "Game already in progress.",
+      });
     }
 
     io.to(roomCode).emit("chat_message", {
       type: "system",
-      text: "Game started! Get ready to draw and guess."
+      text: "Game started! Get ready to draw and guess.",
     });
 
     startGame(room);
@@ -568,19 +680,19 @@ io.on("connection", (socket) => {
     const { roomCode } = socket.data;
     const room = globalState.rooms.get(roomCode);
     if (!room) return;
-    
+
     const guess = (message || "").trim();
     if (!guess) return;
 
     if (checkGuess(room, socket.id, guess)) {
-      return; 
+      return;
     }
 
     const senderName = socket.data.playerName || "Player";
     io.to(roomCode).emit("chat_message", {
       type: "chat",
       playerName: senderName,
-      text: guess
+      text: guess,
     });
   });
 
@@ -588,9 +700,10 @@ io.on("connection", (socket) => {
     const { roomCode } = socket.data;
     const room = globalState.rooms.get(roomCode);
     if (!room) return;
-    
+
     if (room.game.status !== "choosing") return;
-    if (socket.id !== room.game.playerOrder[room.game.currentDrawerIndex]) return;
+    if (socket.id !== room.game.playerOrder[room.game.currentDrawerIndex])
+      return;
 
     selectWord(room, word);
   });
@@ -599,16 +712,16 @@ io.on("connection", (socket) => {
     const { roomCode } = socket.data;
     const room = globalState.rooms.get(roomCode);
     if (!room) return;
-    
+
     socket.emit("game_state_update", {
       roomCode,
       players: getPlayerList(room),
-      game: getSnapshot(room, socket.id)
+      game: getSnapshot(room, socket.id),
     });
-    
+
     socket.emit("player_list_updated", {
       roomCode,
-      players: getPlayerList(room)
+      players: getPlayerList(room),
     });
   });
 
@@ -618,9 +731,10 @@ io.on("connection", (socket) => {
     const { roomCode } = socket.data;
     const room = globalState.rooms.get(roomCode);
     if (!room) return;
-    
+
     if (room.game.status === "drawing") {
-      if (socket.id !== room.game.playerOrder[room.game.currentDrawerIndex]) return;
+      if (socket.id !== room.game.playerOrder[room.game.currentDrawerIndex])
+        return;
     }
     socket.to(roomCode).emit(event, data);
   };
@@ -628,35 +742,47 @@ io.on("connection", (socket) => {
   socket.on("draw_start", (data) => forwardDrawingEvent("draw_start", data));
   socket.on("draw_move", (data) => forwardDrawingEvent("draw_move", data));
   socket.on("draw_end", (data) => forwardDrawingEvent("draw_end", data));
-  
+
   socket.on("draw_data", (data) => {
     const room = globalState.rooms.get(socket.data.roomCode);
-    if (room && room.game.status === "drawing" && socket.id === room.game.playerOrder[room.game.currentDrawerIndex]) {
-       if (data.stroke) room.strokeHistory.push(data.stroke);
-       socket.to(room.roomCode).emit("draw_data", data);
+    if (
+      room &&
+      room.game.status === "drawing" &&
+      socket.id === room.game.playerOrder[room.game.currentDrawerIndex]
+    ) {
+      if (data.stroke) room.strokeHistory.push(data.stroke);
+      socket.to(room.roomCode).emit("draw_data", data);
     }
   });
-  
+
   socket.on("canvas_clear", () => {
     const room = globalState.rooms.get(socket.data.roomCode);
-    if (room && room.game.status === "drawing" && socket.id === room.game.playerOrder[room.game.currentDrawerIndex]) {
-       room.strokeHistory = [];
-       socket.to(room.roomCode).emit("canvas_clear");
+    if (
+      room &&
+      room.game.status === "drawing" &&
+      socket.id === room.game.playerOrder[room.game.currentDrawerIndex]
+    ) {
+      room.strokeHistory = [];
+      socket.to(room.roomCode).emit("canvas_clear");
     }
   });
-  
+
   socket.on("draw_undo", () => {
     const room = globalState.rooms.get(socket.data.roomCode);
-    if (room && room.game.status === "drawing" && socket.id === room.game.playerOrder[room.game.currentDrawerIndex]) {
-       room.strokeHistory.pop();
-       socket.to(room.roomCode).emit("draw_undo");
+    if (
+      room &&
+      room.game.status === "drawing" &&
+      socket.id === room.game.playerOrder[room.game.currentDrawerIndex]
+    ) {
+      room.strokeHistory.pop();
+      socket.to(room.roomCode).emit("draw_undo");
     }
   });
 
   socket.on("disconnect", () => {
     const { roomCode } = socket.data;
     const room = globalState.rooms.get(roomCode);
-    
+
     if (room) {
       const g = room.game;
       const orderIdx = g.playerOrder.indexOf(socket.id);
@@ -664,7 +790,7 @@ io.on("connection", (socket) => {
 
       if (orderIdx !== -1) {
         g.playerOrder.splice(orderIdx, 1);
-        
+
         if (orderIdx === g.currentDrawerIndex) {
           g.currentDrawerIndex--;
           if (g.status === "choosing" || g.status === "drawing") {
@@ -687,7 +813,7 @@ io.on("connection", (socket) => {
         broadcastGameState(room);
       }
     }
-    
+
     console.log(`Socket disconnected: ${socket.id}`);
   });
 });
