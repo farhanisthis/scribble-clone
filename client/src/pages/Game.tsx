@@ -220,7 +220,7 @@ function Game() {
       setChatMessages((prev) => [...prev.slice(-100), msg]); // Keep last 100
 
       let isOverlay = false;
-      if (msg.type === "success") isOverlay = true;
+      if (msg.type === "correct_guess") isOverlay = true;
       if (
         msg.type === "system" &&
         (msg.text.includes("Game over") ||
