@@ -122,6 +122,9 @@ function Game() {
   const [chatInput, setChatInput] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  const [overlayMessage, setOverlayMessage] = useState<string | null>(null);
+  const overlayTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   // Keep a ref of isDrawer so mouse handlers always see the latest value
   // without re-creating the callbacks (which would cause effect churn).
   const isDrawerRef = useRef(game.isDrawer);
@@ -215,6 +218,25 @@ function Game() {
     // ── Chat messages ──
     const handleChatMessage = (msg: ChatMessage) => {
       setChatMessages((prev) => [...prev.slice(-100), msg]); // Keep last 100
+
+      let isOverlay = false;
+      if (msg.type === "success") isOverlay = true;
+      if (
+        msg.type === "system" &&
+        (msg.text.includes("Game over") ||
+          msg.text.includes("Game started") ||
+          msg.text.includes("The word was"))
+      ) {
+        isOverlay = true;
+      }
+
+      if (isOverlay) {
+        setOverlayMessage(msg.text);
+        if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+        overlayTimerRef.current = setTimeout(() => {
+          setOverlayMessage(null);
+        }, 3500);
+      }
     };
 
     const handleGameOver = () => {
@@ -368,6 +390,50 @@ function Game() {
     if (!ctx) return;
 
     const { x, y } = getCanvasCoords(e);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    currentStrokeRef.current?.points.push({ x, y });
+    socket.emit("draw_move", { x, y });
+  };
+
+  const getTouchCoords = (e: React.TouchEvent<HTMLCanvasElement>): Point => {
+    const canvas = canvasRef.current!;
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    return {
+      x: ((touch.clientX - rect.left) / rect.width) * canvas.width,
+      y: ((touch.clientY - rect.top) / rect.height) * canvas.height,
+    };
+  };
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    // touch-action: none in CSS prevents scrolling, but preventDefault guarantees no zoom/pan on some older browsers
+    if (!canDraw()) return;
+    const ctx = ctxRef.current;
+    if (!ctx) return;
+
+    isDrawingRef.current = true;
+    const { x, y } = getTouchCoords(e);
+
+    applyBrushSettings(ctx, brushColor, brushSize);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+
+    currentStrokeRef.current = {
+      points: [{ x, y }],
+      color: brushColor,
+      size: brushSize,
+    };
+
+    socket.emit("draw_start", { x, y, color: brushColor, size: brushSize });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isDrawingRef.current) return;
+    const ctx = ctxRef.current;
+    if (!ctx) return;
+
+    const { x, y } = getTouchCoords(e);
     ctx.lineTo(x, y);
     ctx.stroke();
     currentStrokeRef.current?.points.push({ x, y });
@@ -537,6 +603,10 @@ function Game() {
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseLeave}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleMouseUp}
+              onTouchCancel={handleMouseLeave}
             />
 
             {/* Word chooser overlay — only the drawer sees this */}

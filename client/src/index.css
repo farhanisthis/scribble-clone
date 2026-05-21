@@ -599,6 +599,44 @@ h2 {
   z-index: 10;
 }
 
+/* ── Canvas Announcement Overlay ── */
+
+.canvas-announcement-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 12, 20, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 20;
+  animation: fadeIn 0.3s ease-out;
+  pointer-events: none;
+}
+
+.canvas-announcement-overlay h2 {
+  color: #fff;
+  font-size: 28px;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.4), 0 0 20px rgba(56, 222, 219, 0.6);
+  text-align: center;
+  padding: 20px 30px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  margin: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 .word-overlay--waiting {
   background: rgba(10, 12, 20, 0.75);
 }
