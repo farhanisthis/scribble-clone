@@ -779,7 +779,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("disconnect", () => {
+  const handleLeaveRoom = () => {
     const { roomCode } = socket.data;
     const room = globalState.rooms.get(roomCode);
 
@@ -795,9 +795,8 @@ io.on("connection", (socket) => {
           g.currentDrawerIndex--;
           if (g.status === "choosing" || g.status === "drawing") {
             clearTimers(g);
-            if (g.playerOrder.length < 2) {
-              endGame(room);
-            } else {
+            // We will handle the < 2 check below
+            if (g.playerOrder.length >= 2) {
               startNextTurn(room);
             }
           }
@@ -810,10 +809,30 @@ io.on("connection", (socket) => {
         deleteRoom(roomCode);
       } else {
         broadcastPlayerList(room);
-        broadcastGameState(room);
+        
+        if (room.players.size < 2 && g.status !== "waiting" && g.status !== "game_over") {
+          io.to(roomCode).emit("chat_message", {
+            type: "system",
+            text: "Not enough players to continue. Game over!",
+          });
+          endGame(room);
+        } else {
+          broadcastGameState(room);
+        }
       }
     }
 
+    if (roomCode) {
+      socket.leave(roomCode);
+    }
+    socket.data.roomCode = null;
+    socket.data.playerName = null;
+  };
+
+  socket.on("leave_room", handleLeaveRoom);
+
+  socket.on("disconnect", () => {
+    handleLeaveRoom();
     console.log(`Socket disconnected: ${socket.id}`);
   });
 });

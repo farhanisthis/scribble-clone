@@ -48,6 +48,11 @@ function Home() {
     }
   }, [inviteToken]);
 
+  // Always leave any active room when returning to the home page
+  useEffect(() => {
+    socket.emit("leave_room");
+  }, []);
+
   // Ensure the socket is connected before emitting.
   const ensureConnected = () => {
     if (!socket.connected) socket.connect();
