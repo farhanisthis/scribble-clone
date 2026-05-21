@@ -1,6 +1,6 @@
-# Scribble! — Real-Time Multiplayer Drawing & Guessing Game
+# Scriblo! — Real-Time Multiplayer Drawing & Guessing Game
 
-Scribble! is a real-time multiplayer drawing and guessing game inspired by skribbl.io, built with React, Node.js, Express, and Socket.IO. Players can join public matches instantly or create private rooms with custom game settings to play with friends.
+Scriblo! is a real-time multiplayer drawing and guessing game inspired by skribbl.io, built with React, Node.js, Express, and Socket.IO. Players can join public matches instantly or create private rooms with custom game settings to play with friends.
 
 The game features synchronized canvas drawing, turn-based gameplay, live guessing chat, scoring system, leaderboard tracking, and server-authoritative multiplayer state management for a smooth real-time experience.
 
