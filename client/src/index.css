@@ -1135,20 +1135,20 @@ h2 {
   pointer-events: none;
   user-select: none;
   animation: floatLogo 4s ease-in-out infinite;
-  filter: drop-shadow(0 0 20px rgba(52, 211, 153, 0.4))
-    drop-shadow(0 0 40px rgba(236, 72, 153, 0.3));
+  filter: drop-shadow(0 0 20px rgba(52, 211, 153, 0.1))
+    drop-shadow(0 40px rgba(236, 72, 153, 0.1));
 }
 
 @keyframes floatLogo {
   0%,
   100% {
     transform: translateY(0) scale(1);
-    filter: drop-shadow(0 0 20px rgba(52, 211, 153, 0.4))
-      drop-shadow(0 0 40px rgba(236, 72, 153, 0.3));
+    filter: drop-shadow(0 0 20px rgba(52, 211, 153, 0.1))
+      drop-shadow(0 0 40px rgba(236, 72, 153, 0.1));
   }
   50% {
     transform: translateY(-10px) scale(1.02);
-    filter: drop-shadow(0 0 25px rgba(52, 211, 153, 0.6))
-      drop-shadow(0 0 50px rgba(236, 72, 153, 0.5));
+    filter: drop-shadow(0 0 25px rgba(52, 211, 153, 0.3))
+      drop-shadow(0 0 50px rgba(236, 72, 153, 0.3));
   }
 }
