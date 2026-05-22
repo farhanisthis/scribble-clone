@@ -664,7 +664,7 @@ io.on("connection", (socket) => {
     const room = globalState.rooms.get(roomCode);
     if (!room) return;
 
-    if (!room.isPublic && socket.id !== room.hostId) {
+    if (socket.id !== room.hostId) {
       return callback?.({
         success: false,
         message: "Only the host can start the game.",

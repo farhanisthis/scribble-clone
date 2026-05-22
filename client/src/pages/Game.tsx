@@ -897,7 +897,7 @@ function Game() {
             </ul>
 
             {/* Start / Ready button */}
-            {game.isPublic || game.isHost ? (
+            {game.isHost ? (
               <button
                 type="button"
                 className="primary-button"
