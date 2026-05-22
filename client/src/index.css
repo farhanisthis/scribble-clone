@@ -597,6 +597,7 @@ h2 {
   background: rgba(10, 12, 20, 0.88);
   backdrop-filter: blur(8px);
   z-index: 10;
+  line-height: 1.5;
 }
 
 /* ── Canvas Announcement Overlay ── */
@@ -1188,5 +1189,106 @@ h2 {
     transform: translateY(-10px) scale(1.02);
     filter: drop-shadow(0 0 25px rgba(52, 211, 153, 0.3))
       drop-shadow(0 0 50px rgba(236, 72, 153, 0.3));
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GAME FEEDBACK ANIMATIONS (Correct Guess & Victory)
+   ═══════════════════════════════════════════════════════════════ */
+
+.guess-celebration-popup {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 12, 20, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  border-radius: 999px;
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 50;
+  box-shadow: 0 12px 48px rgba(52, 211, 153, 0.3), inset 0 0 10px rgba(52, 211, 153, 0.1);
+  animation: guessPopIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, guessPopOut 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045) 3s forwards;
+  pointer-events: none;
+}
+
+.guess-celebration-popup .guess-name {
+  color: rgba(245, 239, 231, 0.9);
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.guess-celebration-popup .guess-points {
+  color: #34d399;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-shadow: 0 0 10px rgba(52, 211, 153, 0.4);
+}
+
+@keyframes guessPopIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes guessPopOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -20px) scale(0.85);
+  }
+}
+
+.winner-card {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.15));
+  border: 2px solid rgba(245, 158, 11, 0.5);
+  border-radius: 16px;
+  padding: 24px 32px;
+  text-align: center;
+  box-shadow: 0 12px 48px rgba(245, 158, 11, 0.25), inset 0 0 20px rgba(245, 158, 11, 0.1);
+  animation: winnerCardPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  margin-bottom: 24px;
+}
+
+.winner-card h3 {
+  font-size: 1.5rem;
+  color: #fcd34d;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.winner-card .winner-name {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+  margin-bottom: 4px;
+}
+
+.winner-card .winner-score {
+  font-size: 1.25rem;
+  color: rgba(245, 239, 231, 0.8);
+}
+
+@keyframes winnerCardPop {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }

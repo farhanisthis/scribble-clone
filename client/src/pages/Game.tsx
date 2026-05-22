@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import confetti from "canvas-confetti";
 import { socket } from "../socket";
 
 // ─── Types ──────────────────────────────────────────────────────
@@ -125,6 +126,12 @@ function Game() {
   const [overlayMessage, setOverlayMessage] = useState<string | null>(null);
   const overlayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Temporary UI state for the correct guess celebration
+  const [guessCelebration, setGuessCelebration] = useState<{name: string, points: string} | null>(null);
+  const guessTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+
   // Keep a ref of isDrawer so mouse handlers always see the latest value
   // without re-creating the callbacks (which would cause effect churn).
   const isDrawerRef = useRef(game.isDrawer);
@@ -219,12 +226,43 @@ function Game() {
     const handleChatMessage = (msg: ChatMessage) => {
       setChatMessages((prev) => [...prev.slice(-100), msg]); // Keep last 100
 
+      if (msg.type === "correct_guess") {
+        // Parse the points out of the msg text if it exists (e.g. "(+150)")
+        const pointsMatch = msg.text.match(/\(\+(\d+)\)/);
+        const points = pointsMatch ? `+${pointsMatch[1]}` : "+Points";
+        const name = msg.playerName || "Someone";
+        
+        setGuessCelebration({ name, points });
+
+        // Calculate center of the canvas
+        let originX = 0.5;
+        if (canvasRef.current) {
+          const rect = canvasRef.current.getBoundingClientRect();
+          originX = (rect.left + rect.width / 2) / window.innerWidth;
+        }
+
+        // Trigger a satisfying mini-confetti pop for the achievement
+        confetti({
+          particleCount: 60,
+          spread: 55,
+          origin: { x: originX, y: 0.7 },
+          colors: ['#34d399', '#fcd34d', '#3b82f6'],
+          disableForReducedMotion: true
+        });
+        
+        // Clean up previous timeout to avoid race conditions
+        if (guessTimerRef.current) clearTimeout(guessTimerRef.current);
+        guessTimerRef.current = setTimeout(() => {
+          setGuessCelebration(null);
+        }, 3400); // Hide after CSS animation finishes
+      }
+
       let isOverlay = false;
-      if (msg.type === "correct_guess") isOverlay = true;
       if (
         msg.type === "system" &&
         (msg.text.includes("Game over") ||
           msg.text.includes("Game started") ||
+          msg.text.includes("has guessed the word") ||
           msg.text.includes("The word was"))
       ) {
         isOverlay = true;
@@ -336,6 +374,38 @@ function Game() {
   useEffect(() => {
     if (game.status !== "round_over") {
       setRevealedWord(null);
+    }
+  }, [game.status]);
+
+  // Clean up temporary UI states on component unmount
+  useEffect(() => {
+    return () => {
+      if (guessTimerRef.current) clearTimeout(guessTimerRef.current);
+    };
+  }, []);
+
+  // Trigger confetti and show leaderboard when game ends
+  useEffect(() => {
+    if (game.status === "game_over") {
+      const timer = setTimeout(() => {
+        setShowLeaderboard(true);
+        let originX = 0.5;
+        if (canvasRef.current) {
+          const rect = canvasRef.current.getBoundingClientRect();
+          originX = (rect.left + rect.width / 2) / window.innerWidth;
+        }
+        
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { x: originX, y: 0.6 },
+          colors: ['#34d399', '#f59e0b', '#ec4899', '#3b82f6'],
+          disableForReducedMotion: true
+        });
+      }, 3500); // Wait for the "Game over!" overlay to clear
+      return () => clearTimeout(timer);
+    } else {
+      setShowLeaderboard(false);
     }
   }, [game.status]);
 
@@ -579,7 +649,7 @@ function Game() {
             )}
             {game.status === "round_over" && revealedWord && (
               <span className="word-text word-text--revealed">
-                The word was: <strong>{revealedWord}</strong>
+                {revealedWord}
               </span>
             )}
           </div>
@@ -641,7 +711,7 @@ function Game() {
             )}
 
             {/* Game over overlay */}
-            {game.status === "game_over" && (
+            {game.status === "game_over" && showLeaderboard && (
               <div className="word-overlay word-overlay--gameover">
                 <p className="word-overlay-title">🏆 Game Over!</p>
                 <div className="gameover-rankings">
@@ -650,30 +720,39 @@ function Game() {
                       (a, b) =>
                         (game.scores[b.id] ?? 0) - (game.scores[a.id] ?? 0),
                     )
-                    .map((p, i) => (
-                      <div
-                        key={p.id}
-                        className={`gameover-row ${
-                          i === 0 ? "gameover-row--winner" : ""
-                        }`}
-                      >
-                        <span className="gameover-rank">
-                          {i === 0
-                            ? "🥇"
-                            : i === 1
-                              ? "🥈"
-                              : i === 2
-                                ? "🥉"
-                                : `#${i + 1}`}
-                        </span>
-                        <span className="gameover-name">{p.name}</span>
-                        <span className="gameover-score">
-                          {game.scores[p.id] ?? 0} pts
-                        </span>
-                      </div>
-                    ))}
+                    .map((p, i) => {
+                      if (i === 0) {
+                        return (
+                          <div key={p.id} className="winner-card">
+                            <h3>Winner</h3>
+                            <div className="winner-name">🥇 {p.name}</div>
+                            <div className="winner-score">{game.scores[p.id] ?? 0} points</div>
+                          </div>
+                        );
+                      }
+                      return (
+                        <div key={p.id} className="gameover-row">
+                          <span className="gameover-rank">
+                            {i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`}
+                          </span>
+                          <span className="gameover-name">{p.name}</span>
+                          <span className="gameover-score">
+                            {game.scores[p.id] ?? 0} pts
+                          </span>
+                        </div>
+                      );
+                    })}
                 </div>
                 <p className="word-overlay-timer">Returning to lobby…</p>
+              </div>
+            )}
+
+            {/* Correct Guess Celebration Popup */}
+            {guessCelebration && (
+              <div className="guess-celebration-popup">
+                <span>🎉</span>
+                <span className="guess-name">{guessCelebration.name}</span>
+                <span className="guess-points">{guessCelebration.points}</span>
               </div>
             )}
 
@@ -1017,7 +1096,7 @@ function Game() {
                 <h2>
                   {game.status === "round_over"
                     ? revealedWord
-                      ? `The word was: ${revealedWord}`
+                      ? revealedWord
                       : "Waiting…"
                     : game.maskedWord || "…"}
                 </h2>

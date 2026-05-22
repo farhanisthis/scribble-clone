@@ -23,79 +23,86 @@ const DRAWER_BONUS = 50; // points drawer gets per correct guesser
 // ─── Word Bank ──────────────────────────────────────────────────
 
 const WORD_BANK = [
-  "apple",
-  "banana",
-  "car",
-  "dog",
-  "elephant",
-  "flower",
-  "guitar",
-  "house",
-  "island",
-  "jacket",
-  "kite",
-  "lamp",
-  "mountain",
-  "notebook",
-  "ocean",
-  "piano",
-  "queen",
-  "robot",
-  "sun",
-  "tree",
-  "umbrella",
-  "violin",
-  "whale",
-  "xylophone",
-  "yacht",
-  "zebra",
-  "airplane",
-  "bridge",
-  "castle",
-  "diamond",
-  "eagle",
-  "forest",
-  "globe",
-  "hammer",
-  "igloo",
-  "jungle",
-  "kangaroo",
-  "lighthouse",
-  "mushroom",
-  "necklace",
-  "octopus",
-  "penguin",
-  "rainbow",
-  "sandwich",
-  "telephone",
-  "unicorn",
-  "volcano",
-  "waterfall",
-  "bicycle",
-  "candle",
-  "dragon",
-  "feather",
-  "giraffe",
-  "helicopter",
-  "icecream",
-  "jellyfish",
-  "koala",
-  "lemon",
-  "mermaid",
-  "ninja",
-  "orange",
-  "parrot",
-  "rocket",
-  "starfish",
-  "tornado",
-  "vampire",
-  "wizard",
+  // Existing Words
+  "apple", "banana", "car", "dog", "elephant", "flower", "guitar", "house", "island", "jacket",
+  "kite", "lamp", "mountain", "notebook", "ocean", "piano", "queen", "robot", "sun", "tree",
+  "umbrella", "violin", "whale", "xylophone", "yacht", "zebra", "airplane", "bridge", "castle",
+  "diamond", "eagle", "forest", "globe", "hammer", "igloo", "jungle", "kangaroo", "lighthouse",
+  "mushroom", "necklace", "octopus", "penguin", "rainbow", "sandwich", "telephone", "unicorn",
+  "volcano", "waterfall", "bicycle", "candle", "dragon", "feather", "giraffe", "helicopter",
+  "icecream", "jellyfish", "koala", "lemon", "mermaid", "ninja", "orange", "parrot", "rocket",
+  "starfish", "tornado", "vampire", "wizard",
+
+  // Animals
+  "alligator", "alpaca", "ant", "bat", "bear", "beaver", "bee", "bird", "butterfly", "camel", 
+  "cat", "cheetah", "chicken", "chimpanzee", "cow", "crab", "crocodile", "deer", "dolphin", 
+  "duck", "flamingo", "fox", "frog", "goat", "gorilla", "hamster", "hedgehog", "hippopotamus", 
+  "horse", "iguana", "jaguar", "ladybug", "leopard", "lion", "llama", "lobster", "monkey", 
+  "moose", "mouse", "ostrich", "owl", "panda", "peacock", "pig", "pigeon", "rabbit", "raccoon", 
+  "rat", "rhino", "seal", "shark", "sheep", "sloth", "snail", "snake", "spider", "squid", 
+  "squirrel", "swan", "tiger", "toad", "turkey", "turtle", "walrus", "wolf", "worm",
+
+  // Food & Drinks
+  "avocado", "bacon", "bagel", "bread", "broccoli", "burger", "burrito", "cake", "candy", 
+  "carrot", "cheese", "cherry", "chocolate", "coffee", "cookie", "corn", "croissant", "cupcake", 
+  "donut", "egg", "french fries", "grapes", "hamburger", "hotdog", "kiwi", "lollipop", "mango", 
+  "melon", "milk", "muffin", "onion", "pancake", "peach", "peanut", "pear", "pepper", "pie", 
+  "pineapple", "pizza", "popcorn", "potato", "pretzel", "pumpkin", "salad", "salt", "sausage", 
+  "soup", "spaghetti", "steak", "strawberry", "sushi", "taco", "tea", "toast", "tomato", "waffle", 
+  "watermelon",
+
+  // Household & Objects
+  "alarm clock", "backpack", "basket", "bathtub", "bed", "blanket", "book", "bottle", "bowl", 
+  "broom", "brush", "bucket", "camera", "chair", "clock", "comb", "computer", "couch", "cup", 
+  "door", "drawer", "fan", "flashlight", "fork", "fridge", "glasses", "hair dryer", "headphones", 
+  "key", "keyboard", "knife", "ladder", "laptop", "lock", "magnet", "map", "microphone", "mirror", 
+  "mouse", "mug", "paint", "paper", "pen", "pencil", "phone", "pillow", "plate", "radio", "remote", 
+  "ruler", "scissors", "shampoo", "shoe", "soap", "sock", "sofa", "sponge", "spoon", "table", 
+  "television", "thermometer", "toothbrush", "toothpaste", "towel", "trash can", "tv", "vacuum", 
+  "wallet", "watch", "window",
+
+  // Nature & Environment
+  "beach", "branch", "bush", "cave", "cloud", "comet", "desert", "dirt", "earth", "fire", 
+  "galaxy", "grass", "hill", "ice", "lake", "leaf", "lightning", "meteor", "moon", "planet", 
+  "plant", "puddle", "river", "rock", "root", "sand", "sky", "smoke", "snow", "snowman", "space", 
+  "star", "stone", "storm", "sunflower", "sunset", "thunder", "wave", "wind", "wood",
+
+  // Body Parts
+  "arm", "back", "beard", "bone", "brain", "chest", "chin", "ear", "elbow", "eye", "face", 
+  "finger", "foot", "hair", "hand", "head", "heart", "knee", "leg", "lip", "mouth", "muscle", 
+  "nail", "neck", "nose", "shoulder", "skeleton", "skin", "skull", "stomach", "teeth", "thumb", 
+  "toe", "tongue", "tooth",
+
+  // Professions & People
+  "alien", "astronaut", "baby", "baker", "boy", "builder", "chef", "clown", "cowboy", "dancer", 
+  "dentist", "doctor", "farmer", "firefighter", "ghost", "girl", "king", "knight", "magician", 
+  "man", "nurse", "pilot", "pirate", "police", "princess", "scientist", "singer", "soldier", 
+  "superhero", "teacher", "thief", "waiter", "witch", "woman", "zombie",
+
+  // Vehicles & Transport
+  "ambulance", "boat", "bus", "canoe", "helicopter", "jet", "motorcycle", "rocket", "sailboat", 
+  "scooter", "ship", "skateboard", "submarine", "subway", "tractor", "train", "truck", "van",
+
+  // Clothes
+  "belt", "boots", "cap", "coat", "dress", "gloves", "hat", "hoodie", "jeans", "mittens", 
+  "pants", "scarf", "shirt", "shoes", "shorts", "skirt", "sneakers", "socks", "suit", "sweater", 
+  "tie", "underwear",
+
+  // Actions & Verbs
+  "dance", "draw", "drink", "eat", "fly", "jump", "kick", "laugh", "listen", "paint", "play", 
+  "read", "run", "sing", "sleep", "smile", "swim", "talk", "throw", "walk", "write",
+
+  // Misc / Fun
+  "angel", "battery", "bell", "bomb", "bow", "box", "bubble", "button", "cards", "coin", 
+  "crown", "dice", "drum", "flag", "gem", "gift", "glasses", "guitar", "idea", "magic", 
+  "medal", "money", "music", "password", "photo", "piano", "picture", "present", "ring", 
+  "sword", "target", "ticket", "treasure", "trophy", "video game"
 ];
 
 function maskWord(word) {
   return word
     .split("")
-    .map((ch) => (ch === " " ? "  " : "_"))
+    .map((ch) => (ch === " " ? "\u2003" : "_")) // Use em-space for multiple words
     .join(" ");
 }
 
@@ -386,7 +393,7 @@ function scheduleHints(room, numHints) {
 function revealHint(room) {
   const g = room.game;
   const unrevealedIndices = [];
-  const maskedArr = g.maskedWord.split("");
+  const maskedArr = g.maskedWord.split(" "); // Split by space to get 1-to-1 mapping
 
   for (let i = 0; i < g.currentWord.length; i++) {
     if (g.currentWord[i] !== " " && maskedArr[i] === "_") {
@@ -399,7 +406,7 @@ function revealHint(room) {
   const idx =
     unrevealedIndices[Math.floor(Math.random() * unrevealedIndices.length)];
   maskedArr[idx] = g.currentWord[idx];
-  g.maskedWord = maskedArr.join("");
+  g.maskedWord = maskedArr.join(" ");
 
   io.to(room.roomCode).emit("chat_message", {
     type: "system",
@@ -414,10 +421,19 @@ function endTurn(room) {
   g.status = "round_over";
   g.roundTimeLeft = 0;
 
-  io.to(room.roomCode).emit("turn_over", { word: g.currentWord });
+  let endText = `The word was: ${g.currentWord}`;
+  if (g.guessedPlayers.size > 0) {
+    const firstGuesserId = Array.from(g.guessedPlayers)[0];
+    const firstGuesser = room.players.get(firstGuesserId);
+    if (firstGuesser) {
+      endText = `${firstGuesser.name} has guessed the word ${g.currentWord} right`;
+    }
+  }
+
+  io.to(room.roomCode).emit("turn_over", { word: endText });
   io.to(room.roomCode).emit("chat_message", {
     type: "system",
-    text: `The word was: ${g.currentWord}`,
+    text: endText,
   });
 
   broadcastGameState(room);
