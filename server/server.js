@@ -106,6 +106,14 @@ function maskWord(word) {
     .join(" ");
 }
 
+function formatPlayerName(name) {
+  const trimmed = (name || "Player").trim() || "Player";
+  return trimmed
+    .split(/\s+/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+}
+
 // ─── State ─────────────────────────────────────────────────────
 
 const globalState = {
@@ -540,7 +548,7 @@ io.on("connection", (socket) => {
     }
     if (!targetRoom.hostId) targetRoom.hostId = socket.id;
 
-    const trimmedName = (playerName || "Player").trim() || "Player";
+    const trimmedName = formatPlayerName(playerName);
     addPlayerToRoom(targetRoom, socket.id, trimmedName);
 
     socket.join(targetRoom.roomCode);
@@ -573,7 +581,7 @@ io.on("connection", (socket) => {
       }
 
       const room = addRoom(code, false, socket.id, settings || {});
-      const trimmedName = (playerName || "Player").trim() || "Player";
+      const trimmedName = formatPlayerName(playerName);
 
       addPlayerToRoom(room, socket.id, trimmedName);
       socket.join(room.roomCode);
@@ -599,7 +607,7 @@ io.on("connection", (socket) => {
     if (room.players.size >= room.settings.maxPlayers)
       return callback?.({ success: false, message: "Room is full." });
 
-    const trimmedName = (playerName || "Player").trim() || "Player";
+    const trimmedName = formatPlayerName(playerName);
     addPlayerToRoom(room, socket.id, trimmedName);
     socket.join(room.roomCode);
     socket.data.roomCode = room.roomCode;
@@ -629,7 +637,7 @@ io.on("connection", (socket) => {
       if (room.players.size >= room.settings.maxPlayers)
         return callback?.({ success: false, message: "Room is full." });
 
-      const trimmedName = (playerName || "Player").trim() || "Player";
+      const trimmedName = formatPlayerName(playerName);
       addPlayerToRoom(room, socket.id, trimmedName);
       socket.join(room.roomCode);
       socket.data.roomCode = room.roomCode;
