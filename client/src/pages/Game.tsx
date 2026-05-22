@@ -616,6 +616,12 @@ function Game() {
   const canvasCanDraw =
     game.status === "waiting" || (game.status === "drawing" && game.isDrawer);
 
+  const getCanvasCursor = () => {
+    if (!canvasCanDraw) return "not-allowed";
+    if (brushColor === "eraser") return "crosshair";
+    return `url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%20viewBox%3D%220%200%2032%2032%22%3E%3Ctext%20y%3D%2228%22%20font-size%3D%2228%22%3E%E2%9C%8F%EF%B8%8F%3C%2Ftext%3E%3C%2Fsvg%3E') 0 32, crosshair`;
+  };
+
   // ─── Render ───────────────────────────────────────────────────
 
   return (
@@ -676,7 +682,7 @@ function Game() {
               width={CANVAS_WIDTH}
               height={CANVAS_HEIGHT}
               className="drawing-canvas"
-              style={{ cursor: canvasCanDraw ? "crosshair" : "not-allowed" }}
+              style={{ cursor: getCanvasCursor() }}
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
