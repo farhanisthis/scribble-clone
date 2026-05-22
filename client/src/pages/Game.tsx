@@ -170,6 +170,8 @@ function Game() {
       applyBrushSettings(ctx, stroke.color, stroke.size);
       ctx.beginPath();
       ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+      // Draw a dot if it's a single point
+      ctx.lineTo(stroke.points[0].x, stroke.points[0].y);
       for (let i = 1; i < stroke.points.length; i++) {
         ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
       }
@@ -293,6 +295,8 @@ function Game() {
       applyBrushSettings(ctx, data.color, data.size);
       ctx.beginPath();
       ctx.moveTo(data.x, data.y);
+      ctx.lineTo(data.x, data.y);
+      ctx.stroke();
       remoteStrokeRef.current = {
         points: [{ x: data.x, y: data.y }],
         color: data.color,
@@ -444,6 +448,8 @@ function Game() {
     applyBrushSettings(ctx, brushColor, brushSize);
     ctx.beginPath();
     ctx.moveTo(x, y);
+    ctx.lineTo(x, y);
+    ctx.stroke();
 
     currentStrokeRef.current = {
       points: [{ x, y }],
@@ -488,6 +494,8 @@ function Game() {
     applyBrushSettings(ctx, brushColor, brushSize);
     ctx.beginPath();
     ctx.moveTo(x, y);
+    ctx.lineTo(x, y);
+    ctx.stroke();
 
     currentStrokeRef.current = {
       points: [{ x, y }],
